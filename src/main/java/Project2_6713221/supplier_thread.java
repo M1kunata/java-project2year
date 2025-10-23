@@ -15,13 +15,18 @@ import java.util.concurrent.CyclicBarrier;
 public class supplier_thread extends Thread {
 
     private int min, max;
+    private String threadname;
+    private ArrayList<Warehouse> allw;
+    private Random ran = new Random();
     private CyclicBarrier barrier;
     private boolean check = false;
     private boolean broke = false;
     public supplier_thread(String n) {
         super(n);
+        threadname =n;
     }
-
+    public String getsupname()
+    {return threadname;}
     public void setmin(int m) {
         min = m;
     }
@@ -33,7 +38,10 @@ public class supplier_thread extends Thread {
     public void set_barrier(CyclicBarrier b) {
         barrier = b;
     }
-
+    public void set_ware(ArrayList<Warehouse> w)
+    {
+        allw = w;
+    }
     public synchronized void sleep() {
         while (!check) {
             try {
@@ -52,13 +60,18 @@ public class supplier_thread extends Thread {
     {
         broke=true;
     }
+    private synchronized void put()
+    {
+        int select = ran.nextInt(0, 3); 
+            int mete = ran.nextInt(min,max);
+            allw.get(select).put(mete);
+            System.out.printf("%s >> put %2d materials%6s%s balance = %d\n",Thread.currentThread().getName(),mete," ",allw.get(select).getname(),allw.get(select).getBalance());
+    }
     @Override
     public void run() {
         while (true) {
             sleep();
-            Random ran = new Random();
-            int select = ran.nextInt(0, 3);
-            
+            put();
             try {
                 barrier.await();
             } catch (BrokenBarrierException | InterruptedException e) {

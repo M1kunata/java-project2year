@@ -8,19 +8,18 @@ import java.util.*;
 import java.lang.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-
-class Frieght //wait for gamyui
+/*class Frieght //wait for gamyui
 {
     public String name;
     public int capacity ;
-}
-class warehouse//wait for gamyui
+}*/
+/*class warehouse//wait for gamyui
 {
     public String name;
     public int balance=0;
     
-}
-public class main //extend otherfile function
+}*/
+public class main extends gamyui //extend otherfile function
 {
      //wait for data from readfile of gamyui where class collect file
         int day=5;
@@ -30,8 +29,8 @@ public class main //extend otherfile function
         int maxdaipro = 100;
         int numofsupth =3;
          //wait for data from readfile of gamyui
-     protected ArrayList<Frieght> allf =new ArrayList<>();
-     protected ArrayList<warehouse> allware = new ArrayList<>();
+     protected ArrayList<Freight> allf =new ArrayList<>();
+     protected ArrayList<Warehouse> allware = new ArrayList<>();
      protected ArrayList<supplier_thread> allsup = new ArrayList<>();
       static public void main(String argv[]){
         main mainapp = new main();
@@ -40,32 +39,33 @@ public class main //extend otherfile function
     public void working() 
     {
         //readfile
+        Config config = Config.readConfig("src/main/Java/Project2_6713221/config_1.txt");
         CyclicBarrier barrier = new CyclicBarrier(4);//wait to change to be sum of supplier + factor thread
         String name = Thread.currentThread().getName();
-        for(int i=0;i<3;i++)
+        for(int i=0;i<config.getwarehouseNum();i++)
         {
-            warehouse thing = new warehouse();
-            thing.name = "warehouse_"+i;//function set name of warehouse
+            Warehouse thing = new Warehouse();
+            thing.setname("warehouse_"+i);//function set name of warehouse
             allware.add(thing);
         }
-        for(int i=0;i<2;i++)
+        for(int i=0;i<config.getfreightNum();i++)
         {
-            Frieght f = new Frieght();
-            f.name="Frieght_"+i;
-            f.capacity=maxfriecap;
+            Freight f = new Freight(config.getfreightMaxCapacity());
+            f.set_name("Frieght_"+i);
             allf.add(f);
         }
-        for(int i=0;i<numofsupth;i++)
+        for(int i=0;i<config.getsupplierNum();i++)
         {
-            supplier_thread sup = new supplier_thread("supplierThreads"+i);
-            sup.setmax(maxdaisup);
-            sup.setmin(mindaisup);
+            supplier_thread sup = new supplier_thread("supplierThreads_"+i);
+            sup.setmax(config.getsupplierMax());
+            sup.setmin(config.getsupplierMin());
             sup.set_barrier(barrier);
+            sup.set_ware(allware);
             allsup.add(sup);
-            sup.start();
         }
-        printsetup();
-        
+        printsetup(config);
+        for(supplier_thread t : allsup)
+        {t.start();}
         for(int i=1;i<=day;i++)
         {
           printeachday(i,name,barrier);
@@ -74,19 +74,39 @@ public class main //extend otherfile function
         
         
     }        
-    public void printsetup()
+    public void printsetup(Config con)
     {        
         String name = Thread.currentThread().getName();
         //print set up
         System.out.println(name+" >>  ================ Parameters ===============");
-        System.out.printf("%s >> Day of simulation  : %d\n",name,day );
-        System.out.printf("%s >> Warehouses%9s: \n",name," ");
-        System.out.printf("%s >> Frieghts%11s: \n",name," ");
-        System.out.printf("%s >> Frieghts capacity%2s: max = %d\n",name," ",maxfriecap);
-        System.out.printf("%s >> SupplierThreads%4s: \n",name," ");
-        System.out.printf("%s >> Daily supply%7s: min = %d max = %d\n",name," ",mindaisup,maxdaisup);
+        System.out.printf("%s >> Day of simulation  : %d\n",name,con.getdays() );
+        System.out.printf("%s >> Warehouses%9s: [",name," ");
+        for(int i=0;i<allware.size();i++)
+        {
+            if(i==allware.size()-1)
+                System.out.printf("%s]\n",allware.get(i).getname());
+            else             System.out.printf("%s, ",allware.get(i).getname());
+        }
+        System.out.printf("%s >> Frieghts%11s: [",name," ");
+        for(int i=0;i<allf.size();i++)
+        {
+            if(i==allf.size()-1)
+                System.out.printf("%s]\n",allf.get(i).get_name());
+            else    System.out.printf("%s, ",allf.get(i).get_name());
+        }
+
+        System.out.printf("%s >> Frieghts capacity%2s: max = %d\n",name," ",con.getfreightMaxCapacity());
+        System.out.printf("%s >> SupplierThreads%4s: [",name," ");
+        for(int i =0;i<allsup.size();i++)
+        {
+            if(i==allsup.size()-1)
+                System.out.printf("%s]\n",allsup.get(i).getsupname());
+            else System.out.printf("%s, ",allsup.get(i).getsupname());
+        }
+        System.out.printf("%s >> Daily supply%7s: min = %d max = %d\n",name," ",con.getsupplierMin(),con.getsupplierMax());
         System.out.printf("%s >> FactoryThreads%5s: \n",name," ");
-        System.out.printf("%s >> Daily production%3s: max = %d\n",name," ",maxdaipro);
+        //wait to yok
+        System.out.printf("%s >> Daily production%3s: max = %d\n",name," ",con.getfactoryMax());
         System.out.printf("%s >> \n",name);
     }
     public void printeachday(int d,String n,CyclicBarrier b)
@@ -94,9 +114,9 @@ public class main //extend otherfile function
         System.out.println(n+" >> ===========================================");
         System.out.printf("%s >> Day %d\n",n,d);
         for(int i=0;i<allware.size();i++)
-            System.out.printf("%s >> Warehouse_%d balance  = %d\n",n,i,allware.get(i).balance);
+            System.out.printf("%s >> Warehouse_%d balance  = %d\n",n,i,allware.get(i).getBalance());
         for(int i=0;i<allf.size();i++)
-            System.out.printf("%s >> Freight_%d   capacity = %d\n",n,i,allf.get(i).capacity);
+            System.out.printf("%s >> Freight_%d   capacity = %d\n",n,i,allf.get(i).getMaxCapacity());
         for(supplier_thread t : allsup)
         {
             t.awake();
