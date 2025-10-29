@@ -115,107 +115,115 @@ class Config {
 }
 
 class ConfigReader {
-    
-    public static Config readConfig(String filename) {
-        Config config = new Config();
-        
-        try {
-            File inFile = new File(filename);
-            Scanner fileScan = new Scanner(inFile);
-            
-            System.out.println(Thread.currentThread().getName() + 
-                ": Read config from (relative path) " + inFile.getPath());
-            System.out.println(Thread.currentThread().getName() + 
-                ": Read config from (absolute path) " + inFile.getAbsolutePath() + "\n");
-            
-            while (fileScan.hasNextLine()) {
-                String line = fileScan.nextLine();
 
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
+    public static Config readConfigInteractive() {
 
-                String[] parts = line.split(",");
-                if (parts.length < 2) {
-                    continue;
-                }
+        while (true) {
+            String path = "src/main/java/Project2_6713115/";
+            System.out.print("New file name = ");
+            Scanner in = new Scanner(System.in);
+            String input = in.nextLine();
+            String filename = path + input;
 
-                for (int i = 0; i < parts.length; i++) {
-                    parts[i] = parts[i].trim();
+            try {
+                File inFile = new File(filename);
+                Scanner fileScan = new Scanner(inFile);
+                
+                Config config = new Config();
+                
+                while (fileScan.hasNextLine()) {
+                    String line = fileScan.nextLine().trim();
+                    
+                    // Skip empty lines
+                    if (line.isEmpty()) {
+                        continue;
+                    }
+                    
+                    try {
+                        // Split by comma
+                        String[] parts = line.split(",");
+                        if (parts.length < 2) {
+                            continue;
+                        }
+                        
+                        // Trim all parts to remove extra whitespace
+                        for (int i = 0; i < parts.length; i++) {
+                            parts[i] = parts[i].trim();
+                        }
+                        
+                        String key = parts[0];
+                        
+                        // Parse based on key
+                        switch (key) {
+                            case "days":
+                                config.days = Integer.parseInt(parts[1]);
+                                break;
+                                
+                            case "warehouse_num":
+                                config.warehouseNum = Integer.parseInt(parts[1]);
+                                break;
+                                
+                            case "freight_num_max":
+                                if (parts.length >= 3) {
+                                    config.freightNum = Integer.parseInt(parts[1]);
+                                    config.freightMaxCapacity = Integer.parseInt(parts[2]);
+                                }
+                                break;
+                                
+                            case "supplier_num_min_max":
+                                if (parts.length >= 4) {
+                                    config.supplierNum = Integer.parseInt(parts[1]);
+                                    config.supplierMin = Integer.parseInt(parts[2]);
+                                    config.supplierMax = Integer.parseInt(parts[3]);
+                                }
+                                break;
+                                
+                            case "factory_num_max":
+                                if (parts.length >= 3) {
+                                    config.factoryNum = Integer.parseInt(parts[1]);
+                                    config.factoryMax = Integer.parseInt(parts[2]);
+                                }
+                                break;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println(Thread.currentThread().getName() + 
+                            ": Error parsing line: " + line);
+                        System.out.println(Thread.currentThread().getName() + 
+                            ": " + e.getMessage());
+                    }
                 }
                 
-                String key = parts[0];
-
-                switch (key) {
-                    case "days":
-                        config.days = Integer.parseInt(parts[1]);
-                        break;
-                        
-                    case "warehouse_num":
-                        config.warehouseNum = Integer.parseInt(parts[1]);
-                        break;
-                        
-                    case "freight_num_max":
-                        if (parts.length >= 3) {
-                            config.freightNum = Integer.parseInt(parts[1]);
-                            config.freightMaxCapacity = Integer.parseInt(parts[2]);
-                        }
-                        break;
-                        
-                    case "supplier_num_min_max":
-                        if (parts.length >= 4) {
-                            config.supplierNum = Integer.parseInt(parts[1]);
-                            config.supplierMin = Integer.parseInt(parts[2]);
-                            config.supplierMax = Integer.parseInt(parts[3]);
-                        }
-                        break;
-                        
-                    case "factory_num_max":
-                        if (parts.length >= 3) {
-                            config.factoryNum = Integer.parseInt(parts[1]);
-                            config.factoryMax = Integer.parseInt(parts[2]);
-                        }
-                        break;
-                        
-                    default:
-                        break;
+                fileScan.close();
+                
+                // Validate configuration
+                if (!config.isValid()) {
+                    System.out.println("Error - Invalid configuration values. Please try again.");
+                    continue;
                 }
+                
+                // Success - show separator and return
+                System.out.println("\nmain  >>  ==================== Parameters ====================");
+                return config;
+                
+            } catch (FileNotFoundException e) {
+                System.out.println(e);
+            } catch (Exception e) {
+                System.out.println("Error reading file: " + e.getMessage());
             }
-            
-            fileScan.close();
-
-            if (!config.isValid()) {
-                System.out.println(Thread.currentThread().getName() + 
-                    ": Error - Invalid configuration values in " + filename);
-                return null;
-            }
-            
-            System.out.println(Thread.currentThread().getName() + 
-                ": Successfully read configuration.\n");
-            
-            return config;
-            
-        } catch (FileNotFoundException e) {
-            System.out.println(Thread.currentThread().getName() + 
-                ": Error - Configuration file '" + filename + "' not found!");
-            System.out.println(Thread.currentThread().getName() + 
-                ": Please make sure config.txt exists in the correct folder.");
-            return null;
-            
-        } catch (NumberFormatException e) {
-            System.out.println(Thread.currentThread().getName() + 
-                ": Error - Invalid number format in configuration file: " + e.getMessage());
-            return null;
         }
     }
+    
 
-    public static Config readConfig() {
-        return readConfig("src/main/Java/Project2_6713115/config_1.txt");
-    }
+    
 }
 
-/*
- * This will be replaced by the actual Main class from Mixja
+
+// ============================================================================
+// MAIN CLASS (สำหรับทดสอบ - ภายหลังจะรวมกับงานของคนที่ 2)
+// ============================================================================
+/**
+ * Main class to test functionality of all classes
+ * This will be replaced by the actual Main class from Mix
  */
 public class Project2_6713115 {
     
@@ -305,7 +313,7 @@ public class Project2_6713115 {
         System.out.println("--- Testing ConfigReader ---");
         
         // Test with default path
-        Config config = ConfigReader.readConfig("src/main/Java/Project2_6713115/config_1.txt");
+       Config config = ConfigReader.readConfigInteractive();
         
         if (config != null) {
             System.out.println("✓ Config file loaded successfully");
