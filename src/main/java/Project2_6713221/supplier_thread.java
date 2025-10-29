@@ -62,7 +62,7 @@ public class supplier_thread extends Thread {
     }
     private synchronized void put()
     {
-        int select = ran.nextInt(0, 3); 
+        int select = ran.nextInt(0, allw.size()); 
             int mete = ran.nextInt(min,max);
             allw.get(select).put(mete);
             System.out.printf("%s >> put %2d materials%6s%s balance = %d\n",Thread.currentThread().getName(),mete," ",allw.get(select).getname(),allw.get(select).getBalance());
