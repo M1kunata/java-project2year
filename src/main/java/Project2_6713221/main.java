@@ -19,7 +19,8 @@ import java.util.concurrent.CyclicBarrier;
     public int balance=0;
     
 }*/
-public class main extends gamyui //extend otherfile function
+public class main extends readdata //extend otherfile function
+ //extend otherfile function
 {
      //wait for data from readfile of gamyui where class collect file
         int day=5;
@@ -39,7 +40,7 @@ public class main extends gamyui //extend otherfile function
     public void working() 
     {
         //readfile
-        Config config = Config.readConfig("src/main/Java/Project2_6713221/config_1.txt");
+        Config config = Config.readConfig();
         CyclicBarrier barrier = new CyclicBarrier(4);//wait to change to be sum of supplier + factor thread
         String name = Thread.currentThread().getName();
         for(int i=0;i<config.getwarehouseNum();i++)

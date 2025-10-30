@@ -5,28 +5,35 @@
 package Project2_6713221;
 
 import java.util.*;
-import java.io.*;  
+import java.io.*;
+
 /**
  *
  * @author 6713115 kornchanok phutrakul
  */
-  class Warehouse {
+class Warehouse {
+
     private int balance;
     private String name;
+
     public Warehouse() {
         this.balance = 0;
     }
-    public void setname(String n)
-    {
+
+    public void setname(String n) {
         name = n;
     }
-    public String getname()
-    {return name;}
+
+    public String getname() {
+        return name;
+    }
+
     public synchronized void put(int amount) {
         if (amount > 0) {
             balance += amount;
         }
     }
+
     public synchronized int get(int requestAmount) {
         if (requestAmount <= 0) {
             return 0;
@@ -34,7 +41,7 @@ import java.io.*;
 
         int actualAmount = Math.min(requestAmount, balance);
         balance -= actualAmount;
-        
+
         return actualAmount;
     }
 
@@ -44,21 +51,24 @@ import java.io.*;
 }
 
 class Freight {
+
     private final int maxCapacity;
     private int currentCapacity;
     private String name;
+
     public Freight(int maxCapacity) {
         this.maxCapacity = maxCapacity;
         this.currentCapacity = maxCapacity;
     }
-    public void set_name(String n)
-    {
-        name=n;
+
+    public void set_name(String n) {
+        name = n;
     }
-    public String get_name()
-    {
+
+    public String get_name() {
         return name;
     }
+
     public synchronized int ship(int requestAmount) {
         if (requestAmount <= 0) {
             return 0;
@@ -66,7 +76,7 @@ class Freight {
 
         int actualAmount = Math.min(requestAmount, currentCapacity);
         currentCapacity -= actualAmount;
-        
+
         return actualAmount;
     }
 
@@ -84,6 +94,7 @@ class Freight {
 }
 
 class Config {
+
     private int days;
 
     private int warehouseNum;
@@ -109,15 +120,43 @@ class Config {
         this.factoryNum = 0;
         this.factoryMax = 0;
     }
-    public int getdays(){return days;}
-    public int getwarehouseNum(){return warehouseNum;}
-    public int getfreightNum(){return freightNum;}
-    public int getfreightMaxCapacity(){return freightMaxCapacity;}
-    public int getsupplierNum(){return supplierNum;}
-    public int getsupplierMin(){return supplierMin;}
-    public int getsupplierMax(){return supplierMax;}
-    public int getfactoryNum(){return factoryNum;}
-    public int getfactoryMax(){return factoryMax;}
+
+    public int getdays() {
+        return days;
+    }
+
+    public int getwarehouseNum() {
+        return warehouseNum;
+    }
+
+    public int getfreightNum() {
+        return freightNum;
+    }
+
+    public int getfreightMaxCapacity() {
+        return freightMaxCapacity;
+    }
+
+    public int getsupplierNum() {
+        return supplierNum;
+    }
+
+    public int getsupplierMin() {
+        return supplierMin;
+    }
+
+    public int getsupplierMax() {
+        return supplierMax;
+    }
+
+    public int getfactoryNum() {
+        return factoryNum;
+    }
+
+    public int getfactoryMax() {
+        return factoryMax;
+    }
+
     public void display() {
         System.out.println("=== Configuration ===");
         System.out.println("Days: " + days);
@@ -129,211 +168,213 @@ class Config {
     }
 
     public boolean isValid() {
-        return days > 0 && warehouseNum > 0 && freightNum > 0 && 
-               freightMaxCapacity > 0 && supplierNum > 0 && 
-               supplierMin > 0 && supplierMax >= supplierMin && 
-               factoryNum > 0 && factoryMax > 0;
-    } public static Config readConfig(String filename) {
-        Config config = new Config();
-        
-        try {
-            File inFile = new File(filename);
-            Scanner fileScan = new Scanner(inFile);
-            
-            System.out.println(Thread.currentThread().getName() + 
-                ": Read config from (relative path) " + inFile.getPath());
-            System.out.println(Thread.currentThread().getName() + 
-                ": Read config from (absolute path) " + inFile.getAbsolutePath() + "\n");
-            
-            while (fileScan.hasNextLine()) {
-                String line = fileScan.nextLine();
-
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-
-                String[] parts = line.split(",");
-                if (parts.length < 2) {
-                    continue;
-                }
-
-                for (int i = 0; i < parts.length; i++) {
-                    parts[i] = parts[i].trim();
-                }
-                
-                String key = parts[0];
-
-                switch (key) {
-                    case "days":
-                        config.days = Integer.parseInt(parts[1]);
-                        break;
-                        
-                    case "warehouse_num":
-                        config.warehouseNum = Integer.parseInt(parts[1]);
-                        break;
-                        
-                    case "freight_num_max":
-                        if (parts.length >= 3) {
-                            config.freightNum = Integer.parseInt(parts[1]);
-                            config.freightMaxCapacity = Integer.parseInt(parts[2]);
-                        }
-                        break;
-                        
-                    case "supplier_num_min_max":
-                        if (parts.length >= 4) {
-                            config.supplierNum = Integer.parseInt(parts[1]);
-                            config.supplierMin = Integer.parseInt(parts[2]);
-                            config.supplierMax = Integer.parseInt(parts[3]);
-                        }
-                        break;
-                        
-                    case "factory_num_max":
-                        if (parts.length >= 3) {
-                            config.factoryNum = Integer.parseInt(parts[1]);
-                            config.factoryMax = Integer.parseInt(parts[2]);
-                        }
-                        break;
-                        
-                    default:
-                        break;
-                }
-            }
-            
-            fileScan.close();
-
-            if (!config.isValid()) {
-                System.out.println(Thread.currentThread().getName() + 
-                    ": Error - Invalid configuration values in " + filename);
-                return null;
-            }
-            
-            System.out.println(Thread.currentThread().getName() + 
-                ": Successfully read configuration.\n");
-            
-            return config;
-            
-        } catch (FileNotFoundException e) {
-            System.out.println(Thread.currentThread().getName() + 
-                ": Error - Configuration file '" + filename + "' not found!");
-            System.out.println(Thread.currentThread().getName() + 
-                ": Please make sure config.txt exists in the correct folder.");
-            return null;
-            
-        } catch (NumberFormatException e) {
-            System.out.println(Thread.currentThread().getName() + 
-                ": Error - Invalid number format in configuration file: " + e.getMessage());
-            return null;
-        }
+        return days > 0 && warehouseNum > 0 && freightNum > 0
+                && freightMaxCapacity > 0 && supplierNum > 0
+                && supplierMin > 0 && supplierMax >= supplierMin
+                && factoryNum > 0 && factoryMax > 0;
     }
 
     public static Config readConfig() {
-        return readConfig("src/main/Java/Project2_6713221/config_1.txt");
+        while (true) {
+            String path = "src/main/java/Project2_6713221/";
+            System.out.print("New file name = ");
+            Scanner in = new Scanner(System.in);
+            String input = in.nextLine();
+            String filename = path + input;
+
+            try {
+                File inFile = new File(filename);
+                Scanner fileScan = new Scanner(inFile);
+
+                Config config = new Config();
+
+                while (fileScan.hasNextLine()) {
+                    String line = fileScan.nextLine().trim();
+
+                    // Skip empty lines
+                    if (line.isEmpty()) {
+                        continue;
+                    }
+
+                    try {
+                        // Split by comma
+                        String[] parts = line.split(",");
+                        if (parts.length < 2) {
+                            continue;
+                        }
+
+                        // Trim all parts to remove extra whitespace
+                        for (int i = 0; i < parts.length; i++) {
+                            parts[i] = parts[i].trim();
+                        }
+
+                        String key = parts[0];
+
+                        // Parse based on key
+                        switch (key) {
+                            case "days":
+                                config.days = Integer.parseInt(parts[1]);
+                                break;
+
+                            case "warehouse_num":
+                                config.warehouseNum = Integer.parseInt(parts[1]);
+                                break;
+
+                            case "freight_num_max":
+                                if (parts.length >= 3) {
+                                    config.freightNum = Integer.parseInt(parts[1]);
+                                    config.freightMaxCapacity = Integer.parseInt(parts[2]);
+                                }
+                                break;
+
+                            case "supplier_num_min_max":
+                                if (parts.length >= 4) {
+                                    config.supplierNum = Integer.parseInt(parts[1]);
+                                    config.supplierMin = Integer.parseInt(parts[2]);
+                                    config.supplierMax = Integer.parseInt(parts[3]);
+                                }
+                                break;
+
+                            case "factory_num_max":
+                                if (parts.length >= 3) {
+                                    config.factoryNum = Integer.parseInt(parts[1]);
+                                    config.factoryMax = Integer.parseInt(parts[2]);
+                                }
+                                break;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println(Thread.currentThread().getName()
+                                + ": Error parsing line: " + line);
+                        System.out.println(Thread.currentThread().getName()
+                                + ": " + e.getMessage());
+                    }
+                }
+
+                fileScan.close();
+
+                // Validate configuration
+                if (!config.isValid()) {
+                    System.out.println("Error - Invalid configuration values. Please try again.");
+                    continue;
+                }
+
+                // Success - show separator and return
+                //System.out.println("\nmain  >>  ==================== Parameters ====================");
+                return config;
+
+            } catch (FileNotFoundException e) {
+                System.out.println(e);
+            } catch (Exception e) {
+                System.out.println("Error reading file: " + e.getMessage());
+            }
+        }
     }
-    
+
 }
 
 /*class ConfigReader {
     
    
 }
-*/
-/*
+ */
+ /*
  * This will be replaced by the actual Main class from Mixja
  */
-public class gamyui {
-    
+public class readdata {
+
     public static void main(String[] args) {
         System.out.println("=== Testing Person 1's Classes ===\n");
-        
+
         // Test Warehouse
         testWarehouse();
-        
+
         // Test Freight
         testFreight();
-        
+
         // Test ConfigReader
-        testConfigReader();
-        
+        //testConfigReader();
+
         System.out.println("\n=== All Tests Complete ===");
     }
-    
+
     /**
      * Test Warehouse class functionality
      */
     private static void testWarehouse() {
         System.out.println("--- Testing Warehouse ---");
-        
+
         Warehouse wh = new Warehouse();
         System.out.println("Initial balance: " + wh.getBalance()); // Should be 0
-        
+
         // Test put
         wh.put(100);
         System.out.println("After put(100): " + wh.getBalance()); // Should be 100
-        
+
         wh.put(50);
         System.out.println("After put(50): " + wh.getBalance()); // Should be 150
-        
+
         // Test get - normal case
         int got = wh.get(80);
         System.out.println("Get(80) returned: " + got); // Should be 80
         System.out.println("Balance after get(80): " + wh.getBalance()); // Should be 70
-        
+
         // Test get - insufficient balance
         got = wh.get(100);
         System.out.println("Get(100) returned: " + got); // Should be 70 (all remaining)
         System.out.println("Balance after get(100): " + wh.getBalance()); // Should be 0
-        
+
         // Test get when empty
         got = wh.get(50);
         System.out.println("Get(50) from empty warehouse: " + got); // Should be 0
-        
+
         System.out.println("✓ Warehouse test passed\n");
     }
-    
+
     /**
      * Test Freight class functionality
      */
     private static void testFreight() {
         System.out.println("--- Testing Freight ---");
-        
+
         Freight freight = new Freight(200);
         System.out.println("Max capacity: " + freight.getMaxCapacity()); // Should be 200
         System.out.println("Initial current capacity: " + freight.getCurrentCapacity()); // Should be 200
-        
+
         // Test ship - normal case
         int shipped = freight.ship(80);
         System.out.println("Ship(80) returned: " + shipped); // Should be 80
         System.out.println("Capacity after ship(80): " + freight.getCurrentCapacity()); // Should be 120
-        
+
         // Test ship - exceeds capacity
         shipped = freight.ship(150);
         System.out.println("Ship(150) returned: " + shipped); // Should be 120 (all remaining)
         System.out.println("Capacity after ship(150): " + freight.getCurrentCapacity()); // Should be 0
-        
+
         // Test ship when full
         shipped = freight.ship(50);
         System.out.println("Ship(50) when full: " + shipped); // Should be 0
-        
+
         // Test reset
         freight.reset();
         System.out.println("After reset(): " + freight.getCurrentCapacity()); // Should be 200
-        
+
         System.out.println("✓ Freight test passed\n");
     }
-    
+
     /**
      * Test ConfigReader class functionality
      */
+    /*
     private static void testConfigReader() {
         System.out.println("--- Testing ConfigReader ---");
-        
+
         // Test with default path
         Config config = Config.readConfig("src/main/Java/Project2_6713115/config_1.txt");
-        
+
         if (config != null) {
             System.out.println("✓ Config file loaded successfully");
             config.display();
-            
+
             // Verify values
             System.out.println("Validating config values...");
             /*System.out.println("Days > 0: " + (config.days > 0));
@@ -342,7 +383,7 @@ public class gamyui {
             System.out.println("Suppliers > 0: " + (config.supplierNum > 0));
             System.out.println("Factories > 0: " + (config.factoryNum > 0));
             System.out.println("Valid config: " + config.isValid());
-            */
+             
         } else {
             System.out.println("✗ Failed to load config file");
             System.out.println("Note: Make sure config.txt exists in Project2_XXX folder");
@@ -353,7 +394,7 @@ public class gamyui {
             System.out.println("supplier_num_min_max, 3, 50, 100");
             System.out.println("factory_num_max, 3, 80");
         }
-        
+
         System.out.println("✓ ConfigReader test complete\n");
-    }
+    }*/
 }
