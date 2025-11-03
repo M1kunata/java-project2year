@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Project2_6713221;
 
 import java.util.*;
@@ -9,7 +5,10 @@ import java.io.*;
 
 /**
  *
- * @author 6713115 kornchanok phutrakul
+ * @author 
+ * 6713221 jakkarin roemtangsakul
+ * 6713117 Nuttha Limkhunthammo
+ * 6713115 Kornchanok Phutrakul
  */
 class Warehouse {
 
@@ -28,10 +27,11 @@ class Warehouse {
         return name;
     }
 
-    public synchronized void put(int amount) {
+    public synchronized int put(int amount) {
         if (amount > 0) {
             balance += amount;
         }
+        return balance;
     }
 
     public synchronized int get(int requestAmount) {
@@ -191,26 +191,22 @@ class Config {
                 while (fileScan.hasNextLine()) {
                     String line = fileScan.nextLine().trim();
 
-                    // Skip empty lines
                     if (line.isEmpty()) {
                         continue;
                     }
 
                     try {
-                        // Split by comma
                         String[] parts = line.split(",");
                         if (parts.length < 2) {
                             continue;
                         }
 
-                        // Trim all parts to remove extra whitespace
                         for (int i = 0; i < parts.length; i++) {
                             parts[i] = parts[i].trim();
                         }
 
                         String key = parts[0];
 
-                        // Parse based on key
                         switch (key) {
                             case "days":
                                 config.days = Integer.parseInt(parts[1]);
@@ -252,14 +248,11 @@ class Config {
 
                 fileScan.close();
 
-                // Validate configuration
                 if (!config.isValid()) {
                     System.out.println("Error - Invalid configuration values. Please try again.");
                     continue;
                 }
 
-                // Success - show separator and return
-                //System.out.println("\nmain  >>  ==================== Parameters ====================");
                 return config;
 
             } catch (FileNotFoundException e) {
@@ -272,129 +265,64 @@ class Config {
 
 }
 
-/*class ConfigReader {
-    
-   
-}
- */
- /*
- * This will be replaced by the actual Main class from Mixja
- */
 public class readdata {
 
     public static void main(String[] args) {
         System.out.println("=== Testing Person 1's Classes ===\n");
 
-        // Test Warehouse
         testWarehouse();
 
-        // Test Freight
         testFreight();
-
-        // Test ConfigReader
-        //testConfigReader();
 
         System.out.println("\n=== All Tests Complete ===");
     }
 
-    /**
-     * Test Warehouse class functionality
-     */
     private static void testWarehouse() {
         System.out.println("--- Testing Warehouse ---");
 
         Warehouse wh = new Warehouse();
-        System.out.println("Initial balance: " + wh.getBalance()); // Should be 0
-
-        // Test put
+        System.out.println("Initial balance: " + wh.getBalance());
         wh.put(100);
-        System.out.println("After put(100): " + wh.getBalance()); // Should be 100
+        System.out.println("After put(100): " + wh.getBalance()); 
 
         wh.put(50);
-        System.out.println("After put(50): " + wh.getBalance()); // Should be 150
+        System.out.println("After put(50): " + wh.getBalance()); 
 
-        // Test get - normal case
         int got = wh.get(80);
-        System.out.println("Get(80) returned: " + got); // Should be 80
-        System.out.println("Balance after get(80): " + wh.getBalance()); // Should be 70
+        System.out.println("Get(80) returned: " + got);
+        System.out.println("Balance after get(80): " + wh.getBalance());
 
-        // Test get - insufficient balance
         got = wh.get(100);
-        System.out.println("Get(100) returned: " + got); // Should be 70 (all remaining)
-        System.out.println("Balance after get(100): " + wh.getBalance()); // Should be 0
+        System.out.println("Get(100) returned: " + got);
+        System.out.println("Balance after get(100): " + wh.getBalance());
 
-        // Test get when empty
         got = wh.get(50);
-        System.out.println("Get(50) from empty warehouse: " + got); // Should be 0
+        System.out.println("Get(50) from empty warehouse: " + got);
 
         System.out.println("✓ Warehouse test passed\n");
     }
 
-    /**
-     * Test Freight class functionality
-     */
     private static void testFreight() {
         System.out.println("--- Testing Freight ---");
 
         Freight freight = new Freight(200);
-        System.out.println("Max capacity: " + freight.getMaxCapacity()); // Should be 200
-        System.out.println("Initial current capacity: " + freight.getCurrentCapacity()); // Should be 200
+        System.out.println("Max capacity: " + freight.getMaxCapacity());
+        System.out.println("Initial current capacity: " + freight.getCurrentCapacity());
 
-        // Test ship - normal case
         int shipped = freight.ship(80);
-        System.out.println("Ship(80) returned: " + shipped); // Should be 80
-        System.out.println("Capacity after ship(80): " + freight.getCurrentCapacity()); // Should be 120
+        System.out.println("Ship(80) returned: " + shipped);
+        System.out.println("Capacity after ship(80): " + freight.getCurrentCapacity());
 
-        // Test ship - exceeds capacity
         shipped = freight.ship(150);
-        System.out.println("Ship(150) returned: " + shipped); // Should be 120 (all remaining)
-        System.out.println("Capacity after ship(150): " + freight.getCurrentCapacity()); // Should be 0
+        System.out.println("Ship(150) returned: " + shipped);
+        System.out.println("Capacity after ship(150): " + freight.getCurrentCapacity());
 
-        // Test ship when full
         shipped = freight.ship(50);
-        System.out.println("Ship(50) when full: " + shipped); // Should be 0
+        System.out.println("Ship(50) when full: " + shipped);
 
-        // Test reset
         freight.reset();
-        System.out.println("After reset(): " + freight.getCurrentCapacity()); // Should be 200
+        System.out.println("After reset(): " + freight.getCurrentCapacity());
 
         System.out.println("✓ Freight test passed\n");
     }
-
-    /**
-     * Test ConfigReader class functionality
-     */
-    /*
-    private static void testConfigReader() {
-        System.out.println("--- Testing ConfigReader ---");
-
-        // Test with default path
-        Config config = Config.readConfig("src/main/Java/Project2_6713115/config_1.txt");
-
-        if (config != null) {
-            System.out.println("✓ Config file loaded successfully");
-            config.display();
-
-            // Verify values
-            System.out.println("Validating config values...");
-            /*System.out.println("Days > 0: " + (config.days > 0));
-            System.out.println("Warehouses > 0: " + (config.warehouseNum > 0));
-            System.out.println("Freights > 0: " + (config.freightNum > 0));
-            System.out.println("Suppliers > 0: " + (config.supplierNum > 0));
-            System.out.println("Factories > 0: " + (config.factoryNum > 0));
-            System.out.println("Valid config: " + config.isValid());
-             
-        } else {
-            System.out.println("✗ Failed to load config file");
-            System.out.println("Note: Make sure config.txt exists in Project2_XXX folder");
-            System.out.println("\nSample config.txt content:");
-            System.out.println("days, 5");
-            System.out.println("warehouse_num, 3");
-            System.out.println("freight_num_max, 2, 100");
-            System.out.println("supplier_num_min_max, 3, 50, 100");
-            System.out.println("factory_num_max, 3, 80");
-        }
-
-        System.out.println("✓ ConfigReader test complete\n");
-    }*/
 }
